@@ -1,0 +1,128 @@
+:root{
+    --bg:#f4f6f9;
+    --card:#ffffff;
+    --text:#212529;
+    --muted:#6c757d;
+    --table:#f8f9fa;
+    --border:#dee2e6;
+}
+
+body[data-theme="dark"]{
+    --bg:#121417;
+    --card:#1c1f24;
+    --text:#f1f3f5;
+    --muted:#adb5bd;
+    --table:#2b3035;
+    --border:#495057;
+}
+
+body{
+    background:var(--bg);
+    color:var(--text);
+    transition:.25s;
+}
+
+.card{
+    background:var(--card);
+    color:var(--text);
+    border-color:var(--border);
+}
+
+.table{
+    color:var(--text);
+}
+
+.table thead{
+    background:var(--table);
+}
+
+.table-light th{
+    background:var(--table) !important;
+    color:var(--text);
+    border-color:var(--border);
+}
+
+.table td{
+    border-color:var(--border);
+    vertical-align:middle;
+}
+
+.titulo{
+    font-weight:700;
+}
+
+.escudo{
+    width:28px;
+    height:28px;
+}
+
+.status{
+    width:18px;
+    height:18px;
+    border-radius:50%;
+    display:inline-block;
+}
+
+.AZUL{ background:#0d6efd; }
+.VERDE{ background:#198754; }
+.AMARELO{ background:#ffc107; }
+.VERMELHO{ background:#dc3545; }
+.PRETO{ background:#212529; }
+
+.atrasado{
+    color:#fd7e14;
+    font-size:.85rem;
+}
+
+.criterio{
+    width:32px;
+    text-align:center;
+    font-weight:bold;
+}
+
+/* ===== Tema escuro ===== */
+
+body[data-theme="dark"] .table-hover tbody tr:hover{
+    background:#2d333b;
+}
+
+body[data-theme="dark"] .text-secondary{
+    color:#adb5bd !important;
+}
+
+body[data-theme="dark"] .form-control{
+    background:#2b3035;
+    color:#f8f9fa;
+    border-color:#495057;
+}
+
+body[data-theme="dark"] .form-control:focus{
+    background:#2b3035;
+    color:#fff;
+    border-color:#6ea8fe;
+    box-shadow:none;
+}
+
+body[data-theme="dark"] .btn-outline-secondary{
+    color:#ced4da;
+    border-color:#6c757d;
+}
+
+body[data-theme="dark"] .btn-outline-secondary:hover{
+    background:#495057;
+    color:#fff;
+}
+
+body[data-theme="dark"] .table td,
+body[data-theme="dark"] .table th{
+    background:var(--card);
+    color:var(--text);
+}
+
+body[data-theme="dark"] .table-light th{
+    background:#2b3035 !important;
+}
+
+body[data-theme="dark"] .card{
+    box-shadow:0 .25rem .5rem rgba(0,0,0,.35);
+}
