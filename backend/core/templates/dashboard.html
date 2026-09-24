@@ -1,0 +1,246 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Rebaixamento Campeonato Brasileiro 2026</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'core/css/dashboard.css' %}">
+</head>
+
+<body id="pagina" data-theme="light">
+
+<div class="container py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h2 class="titulo mb-0">
+                Rebaixamento Campeonato Brasileiro 2026
+            </h2>
+            <small class="text-secondary">
+                Simulador de permanência • Série A
+            </small>
+        </div>
+
+        <form method="get" class="d-flex align-items-center gap-2">
+
+            <label class="fw-semibold">Corte</label>
+
+            <input
+                type="number"
+                name="corte"
+                value="{{ corte }}"
+                min="30"
+                max="60"
+                class="form-control"
+                style="width:90px;">
+
+            <button class="btn btn-success">
+                Atualizar
+            </button>
+
+            <button
+                id="btnTema"
+                type="button"
+                class="btn btn-outline-secondary"
+                onclick="alternarTema()">
+                🌙
+            </button>
+
+        </form>
+
+    </div>
+
+    <div class="row mb-4">
+
+        <div class="col">
+            <div class="card text-center p-3">
+                <div class="fs-3">🔵</div>
+                <div class="small text-secondary">Salvos</div>
+                <h3>{{ salvos }}</h3>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="card text-center p-3">
+                <div class="fs-3">🟢</div>
+                <div class="small text-secondary">Confortáveis</div>
+                <h3>{{ verdes }}</h3>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="card text-center p-3">
+                <div class="fs-3">🟡</div>
+                <div class="small text-secondary">Atenção</div>
+                <h3>{{ amarelos }}</h3>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="card text-center p-3">
+                <div class="fs-3">🔴</div>
+                <div class="small text-secondary">Risco</div>
+                <h3>{{ vermelhos }}</h3>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="card text-center p-3">
+                <div class="fs-3">⚫</div>
+                <div class="small text-secondary">Eliminados</div>
+                <h3>{{ pretos }}</h3>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="card shadow-sm">
+
+        <div class="table-responsive">
+
+            <table class="table table-hover align-middle mb-0">
+
+                <thead class="table-light">
+
+                <tr>
+                    <th>Pos</th>
+                    <th>Time</th>
+                    <th>P</th>
+                    <th>Crit.</th>
+                    <th>J</th>
+                    <th>R</th>
+                    <th>Camp.%</th>
+                    <th>Rec.%</th>
+                    <th>Nec.%</th>
+                    <th>Δ%</th>
+                    <th></th>
+                </tr>
+
+                </thead>
+
+                <tbody>
+
+                {% for linha in tabela %}
+
+                <tr>
+
+                    <td>{{ linha.posicao }}</td>
+
+                    <td>
+                        <img src="{{ linha.time.escudo }}" class="escudo me-2">
+                        {{ linha.time.nome }}
+                    </td>
+
+                    <td>
+                        <strong>{{ linha.time.pontos }}</strong>
+
+                        {% if linha.jogos_atrasados %}
+                            <span class="atrasado">⏰</span>
+                        {% endif %}
+                    </td>
+
+                    <td class="criterio">
+                        {{ linha.criterio }}
+                    </td>
+
+                    <td>{{ linha.time.jogos }}</td>
+
+                    <td>{{ linha.jogos_restantes }}</td>
+
+                    <td>{{ linha.camp_pct }}%</td>
+
+                    <td>{{ linha.rec_pct }}%</td>
+
+                    <td>{{ linha.nec_pct }}%</td>
+
+                    <td>
+                        {% if linha.delta_pct > 0 %}
+                            <span class="text-success fw-bold">
+                                +{{ linha.delta_pct }}%
+                            </span>
+                        {% else %}
+                            <span class="text-danger fw-bold">
+                                {{ linha.delta_pct }}%
+                            </span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        <span class="status {{ linha.status }}"></span>
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+    <div class="row mt-4">
+
+        <div class="col-md-6">
+
+            <div class="card p-3">
+
+                <h6>Critérios de desempate</h6>
+
+                <div>**V** Vitórias</div>
+                <div>**Δ** Saldo de gols</div>
+                <div>⚽ Gols pró</div>
+                <div>⚔️ Confronto direto</div>
+                <div>🟥 Cartões vermelhos</div>
+                <div>🟨 Cartões amarelos</div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-6">
+
+            <div class="card p-3">
+
+                <h6>Semáforo</h6>
+
+                <div>🔵 Salvo</div>
+                <div>🟢 Confortável</div>
+                <div>🟡 Atenção</div>
+                <div>🔴 Precisa melhorar</div>
+                <div>⚫ Sem possibilidade matemática</div>
+                <div class="mt-2">⏰ Jogo atrasado</div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+    const body = document.getElementById("pagina");
+    const botao = document.getElementById("btnTema");
+
+    // Carrega a preferência salva
+    const temaSalvo = localStorage.getItem("tema") || "light";
+    body.dataset.theme = temaSalvo;
+    botao.textContent = temaSalvo === "dark" ? "☀️" : "🌙";
+
+    function alternarTema() {
+        const novoTema = body.dataset.theme === "light" ? "dark" : "light";
+
+        body.dataset.theme = novoTema;
+        localStorage.setItem("tema", novoTema);
+
+        botao.textContent = novoTema === "dark" ? "☀️" : "🌙";
+    }
+</script>
+
+</body>
+</html>
