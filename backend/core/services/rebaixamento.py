@@ -18,6 +18,7 @@ class LinhaTabela:
     rec_pct: float
     nec_pct: float
     delta_pct: float
+    pontos_faltantes: int | None
 
     criterio: str
     status: str
@@ -163,9 +164,14 @@ def classificar_times(times, corte=45):
 
         rec = aproveitamento_recente(time)
 
-        nec = aproveitamento_necessario(time, corte)
-
-        delta = round(rec - nec, 1)
+        if time.pontos >= corte:
+            nec = None
+            delta = None
+            pontos_faltantes = None
+        else:
+            nec = aproveitamento_necessario(time, corte)
+            delta = round(rec - nec, 1)
+            pontos_faltantes = corte - time.pontos
 
         if pos == 1:
             criterio = ""
@@ -186,6 +192,7 @@ def classificar_times(times, corte=45):
                 rec_pct=rec,
                 nec_pct=nec,
                 delta_pct=delta,
+                pontos_faltantes=pontos_faltantes,
                 criterio=criterio,
                 status=status,
             )

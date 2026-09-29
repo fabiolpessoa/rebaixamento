@@ -75,7 +75,6 @@ body{
 }
 
 .criterio{
-    width:32px;
     text-align:center;
     font-weight:bold;
 }
@@ -125,4 +124,80 @@ body[data-theme="dark"] .table-light th{
 
 body[data-theme="dark"] .card{
     box-shadow:0 .25rem .5rem rgba(0,0,0,.35);
+}
+
+.table-responsive .table {
+    width: 100%;
+    table-layout: fixed;
+}
+
+/* Todas as colunas centralizadas */
+.table-responsive tbody td {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.table-responsive .table {
+    width: 100%;
+    table-layout: fixed;
+}
+
+/* Exceção: coluna Time alinhada à esquerda */
+.table-responsive tbody td:nth-child(2) {
+    text-align: left;
+    white-space: nowrap;
+}
+
+.table-responsive thead th:nth-child(2),
+.table-responsive tbody td:nth-child(2) {
+    width: 24%;
+}
+
+
+/* Cabeçalho fixo criado pelo JavaScript */
+.tabela-cabecalho-fixo {
+    position: fixed;
+    top: 0;
+    z-index: 1000;
+    display: none;
+    margin: 0;
+    background: var(--card);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .15);
+}
+
+.tabela-cabecalho-fixo th {
+    text-align: center;
+    vertical-align: middle;
+    background: var(--table) !important;
+    color: var(--text);
+    border-color: var(--border);
+}
+
+/* Mantém a coluna Time alinhada à esquerda */
+.tabela-cabecalho-fixo th:nth-child(2) {
+    text-align: left;
+}
+
+/* Cabeçalho fixo: mesmo alinhamento do cabeçalho original */
+.tabela-cabecalho-fixo th {
+    box-sizing: border-box;
+    text-align: center !important;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+/* Somente a coluna Time fica alinhada à esquerda */
+.tabela-cabecalho-fixo th:nth-child(2) {
+    text-align: left !important;
+}
+
+/* Alinhamento do cabeçalho original */
+.table-responsive .table thead th {
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* A coluna Time permanece alinhada à esquerda */
+.table-responsive .table thead th:nth-child(2) {
+    text-align: left;
 }

@@ -101,20 +101,36 @@
         <div class="table-responsive">
 
             <table class="table table-hover align-middle mb-0">
-
-                <thead class="table-light">
+                
+                <colgroup>
+                    <col style="width: 7%;">
+                    <col style="width: 23%;">
+                    <col style="width: 7%;">
+                    <col style="width: 10%;">
+                    <col style="width: 7%;">
+                    <col style="width: 8%;">
+                    <col style="width: 7%;">
+                    <col style="width: 7%;">
+                    <col style="width: 7%;">
+                    <col style="width: 7%;">
+                    <col style="width: 7%;">
+                    <col style="width: 3%;">
+                </colgroup>
+                
+                <thead class="table-light cabecalho-tabela">
 
                 <tr>
-                    <th>Pos</th>
+                    <th>Posição</th>
                     <th>Time</th>
-                    <th>P</th>
-                    <th>Crit.</th>
-                    <th>J</th>
-                    <th>R</th>
+                    <th>Pontos</th>
+                    <th>Critério</th>
+                    <th>Jogos</th>
+                    <th>Restante</th>
                     <th>Camp.%</th>
                     <th>Rec.%</th>
                     <th>Nec.%</th>
                     <th>Δ%</th>
+                    <th>Faltam</th>
                     <th></th>
                 </tr>
 
@@ -153,17 +169,35 @@
 
                     <td>{{ linha.rec_pct }}%</td>
 
-                    <td>{{ linha.nec_pct }}%</td>
+                    <td>
+                        {% if linha.nec_pct is not None %}
+                            {{ linha.nec_pct }}%
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
 
                     <td>
-                        {% if linha.delta_pct > 0 %}
-                            <span class="text-success fw-bold">
-                                +{{ linha.delta_pct }}%
-                            </span>
+                        {% if linha.delta_pct is not None %}
+                            {% if linha.delta_pct > 0 %}
+                                <span class="text-success fw-bold">
+                                    +{{ linha.delta_pct }}%
+                                </span>
+                            {% else %}
+                                <span class="text-danger fw-bold">
+                                    {{ linha.delta_pct }}%
+                                </span>
+                            {% endif %}
                         {% else %}
-                            <span class="text-danger fw-bold">
-                                {{ linha.delta_pct }}%
-                            </span>
+                            —
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {% if linha.pontos_faltantes is not None %}
+                            {{ linha.pontos_faltantes }}
+                        {% else %}
+                            —
                         {% endif %}
                     </td>
 
@@ -233,13 +267,71 @@
     botao.textContent = temaSalvo === "dark" ? "☀️" : "🌙";
 
     function alternarTema() {
-        const novoTema = body.dataset.theme === "light" ? "dark" : "light";
+        const novoTema =
+            body.dataset.theme === "light" ? "dark" : "light";
 
         body.dataset.theme = novoTema;
         localStorage.setItem("tema", novoTema);
 
         botao.textContent = novoTema === "dark" ? "☀️" : "🌙";
     }
+
+    // Cabeçalho fixo durante o scroll
+    const tabela = document.querySelector(".table");
+    const cabecalho = document.querySelector(".cabecalho-tabela");
+
+    const cabecalhoClone = cabecalho.cloneNode(true);
+    cabecalhoClone.classList.add("cabecalho-fixo");
+
+    const tabelaFixa = document.createElement("table");
+    tabelaFixa.className = "table tabela-cabecalho-fixo";
+    tabelaFixa.appendChild(cabecalhoClone);
+
+    document.body.appendChild(tabelaFixa);
+
+    function ajustarCabecalho() {
+        const tabelaRect = tabela.getBoundingClientRect();
+
+        // Mesmo tamanho e posição horizontal da tabela original
+        tabelaFixa.style.width = `${tabelaRect.width}px`;
+        tabelaFixa.style.left = `${tabelaRect.left}px`;
+        tabelaFixa.style.transform = "none";
+
+        // Mesmas larguras das colunas originais
+        const colunasOriginais = tabela.querySelectorAll("thead th");
+        const colunasFixas = cabecalhoClone.querySelectorAll("th");
+
+        colunasOriginais.forEach((coluna, index) => {
+            if (colunasFixas[index]) {
+                colunasFixas[index].style.width =
+                    `${coluna.getBoundingClientRect().width}px`;
+            }
+        });
+    }
+
+    function atualizarCabecalho() {
+        const tabelaRect = tabela.getBoundingClientRect();
+        const cabecalhoRect = cabecalho.getBoundingClientRect();
+
+        if (
+            tabelaRect.top < 0 &&
+            tabelaRect.bottom > cabecalhoRect.height
+        ) {
+            tabelaFixa.style.display = "table";
+        } else {
+            tabelaFixa.style.display = "none";
+        }
+    }
+
+    window.addEventListener("scroll", atualizarCabecalho);
+
+    window.addEventListener("resize", () => {
+        ajustarCabecalho();
+        atualizarCabecalho();
+    });
+
+    ajustarCabecalho();
+    atualizarCabecalho();
 </script>
 
 </body>
