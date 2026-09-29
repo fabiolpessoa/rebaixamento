@@ -116,7 +116,7 @@
                     <col style="width: 7%;">
                     <col style="width: 3%;">
                 </colgroup>
-                
+
                 <thead class="table-light cabecalho-tabela">
 
                 <tr>
@@ -145,8 +145,17 @@
                     <td>{{ linha.posicao }}</td>
 
                     <td>
-                        <img src="{{ linha.time.escudo }}" class="escudo me-2">
-                        {{ linha.time.nome }}
+                        <button
+                            type="button"
+                            class="btn btn-link p-0 text-decoration-none nome-time"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#jogos-{{ linha.time.id }}"
+                            aria-expanded="false"
+                            aria-controls="jogos-{{ linha.time.id }}"
+                        >
+                            <img src="{{ linha.time.escudo }}" class="escudo me-2">
+                            {{ linha.time.nome }}
+                        </button>
                     </td>
 
                     <td>
@@ -206,7 +215,68 @@
                     </td>
 
                 </tr>
+                <tr>
+                    <td colspan="12" class="p-0">
+                        <div
+                            id="jogos-{{ linha.time.id }}"
+                            class="collapse"
+                        >
+                            <div class="p-3">
+                                <div class="row">
 
+                                    <div class="col-md-6">
+                                        <h6 class="fw-bold text-center">
+                                            Últimos 5 jogos
+                                        </h6>
+                                        {% for jogo in linha.jogos_anteriores %}
+                                            <div class="small border-bottom py-2">
+                                                Rodada {{ jogo.rodada }} —
+                                                {% if jogo.mandante == linha.time %}
+                                                    {{ jogo.mandante.nome }} {{ jogo.gols_mandante }}
+                                                    x
+                                                    {{ jogo.gols_visitante }} {{ jogo.visitante.nome }}
+                                                {% else %}
+                                                    {{ jogo.visitante.nome }} {{ jogo.gols_visitante }}
+                                                    x
+                                                    {{ jogo.gols_mandante }} {{ jogo.mandante.nome }}
+                                                {% endif %}
+                                            </div>
+                                        {% empty %}
+                                            <div class="text-secondary small">
+                                                Nenhum jogo realizado.
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <h6 class="fw-bold text-center">
+                                            Próximos 5 jogos
+                                        </h6>
+                                        {% for jogo in linha.jogos_proximos %}
+                                            <div class="small border-bottom py-2">
+                                                Rodada {{ jogo.rodada }} —
+                                                {% if jogo.mandante == linha.time %}
+                                                    {{ jogo.mandante.nome }}
+                                                    x
+                                                    {{ jogo.visitante.nome }}
+                                                {% else %}
+                                                    {{ jogo.visitante.nome }}
+                                                    x
+                                                    {{ jogo.mandante.nome }}
+                                                {% endif %}
+                                            </div>
+                                        {% empty %}
+                                            <div class="text-secondary small">
+                                                Nenhum próximo jogo cadastrado.
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
                 {% endfor %}
 
                 </tbody>
@@ -333,6 +403,8 @@
     ajustarCabecalho();
     atualizarCabecalho();
 </script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>

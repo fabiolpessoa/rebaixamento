@@ -23,6 +23,9 @@ class LinhaTabela:
     criterio: str
     status: str
 
+    jogos_anteriores: list
+    jogos_proximos: list
+
 
 def percentual(pontos, jogos):
     if jogos == 0:
@@ -195,6 +198,8 @@ def classificar_times(times, corte=45):
                 pontos_faltantes=pontos_faltantes,
                 criterio=criterio,
                 status=status,
+                jogos_anteriores=jogos_do_time(time)["anteriores"],
+                jogos_proximos=jogos_do_time(time)["proximos"],
             )
         )
 
@@ -233,3 +238,24 @@ def aproveitamento_recente(time):
             pontos += 1
 
     return round((pontos / (len(jogos) * 3)) * 100, 1)
+
+def jogos_do_time(time):
+    jogos = (
+        Jogo.objects
+        .filter(Q(mandante=time) | Q(visitante=time))
+        .order_by("rodada")
+    )
+
+    jogos_anteriores = []
+    jogos_proximos = []
+
+    for jogo in jogos:
+        if jogo.finalizado:
+            jogos_anteriores.append(jogo)
+        else:
+            jogos_proximos.append(jogo)
+
+    return {
+        "anteriores": jogos_anteriores[-5:],
+        "proximos": jogos_proximos[:5],
+    }
