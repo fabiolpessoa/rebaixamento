@@ -1,160 +1,246 @@
-:root{
-    --bg:#f4f6f9;
-    --card:#ffffff;
-    --text:#212529;
-    --muted:#6c757d;
-    --table:#f8f9fa;
-    --border:#dee2e6;
+:root {
+    --bg: #f4f6f9;
+    --card: #ffffff;
+    --text: #212529;
+    --muted: #6c757d;
+    --table: #f8f9fa;
+    --border: #dee2e6;
 }
 
-body[data-theme="dark"]{
-    --bg:#121417;
-    --card:#1c1f24;
-    --text:#f1f3f5;
-    --muted:#adb5bd;
-    --table:#2b3035;
-    --border:#495057;
+body[data-theme="dark"] {
+    --bg: #121417;
+    --card: #1c1f24;
+    --text: #f1f3f5;
+    --muted: #adb5bd;
+    --table: #2b3035;
+    --border: #495057;
 }
 
-body{
-    background:var(--bg);
-    color:var(--text);
-    transition:.25s;
+body {
+    background: var(--bg);
+    color: var(--text);
+    transition: .25s;
 }
 
-.card{
-    background:var(--card);
-    color:var(--text);
-    border-color:var(--border);
+.card {
+    background: var(--card);
+    color: var(--text);
+    border-color: var(--border);
 }
 
-.table{
-    color:var(--text);
+.table {
+    color: var(--text);
 }
 
-.table thead{
-    background:var(--table);
+.table thead {
+    background: var(--table);
 }
 
-.table-light th{
-    background:var(--table) !important;
-    color:var(--text);
-    border-color:var(--border);
+.table-light th {
+    background: var(--table) !important;
+    color: var(--text);
+    border-color: var(--border);
 }
 
-.table td{
-    border-color:var(--border);
-    vertical-align:middle;
+.table td {
+    border-color: var(--border);
+    vertical-align: middle;
 }
 
-.titulo{
-    font-weight:700;
+.titulo {
+    font-weight: 700;
 }
 
-.escudo{
-    width:28px;
-    height:28px;
+.escudo {
+    width: 28px;
+    height: 28px;
 }
 
-.status{
-    width:18px;
-    height:18px;
-    border-radius:50%;
-    display:inline-block;
+.status {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: inline-block;
 }
 
-.AZUL{ background:#0d6efd; }
-.VERDE{ background:#198754; }
-.AMARELO{ background:#ffc107; }
-.VERMELHO{ background:#dc3545; }
-.PRETO{ background:#212529; }
-
-.atrasado{
-    color:#fd7e14;
-    font-size:.85rem;
+.AZUL {
+    background: #0d6efd;
 }
 
-.criterio{
-    text-align:center;
-    font-weight:bold;
+.VERDE {
+    background: #198754;
 }
 
-/* ===== Tema escuro ===== */
-
-body[data-theme="dark"] .table-hover tbody tr:hover{
-    background:#2d333b;
+.AMARELO {
+    background: #ffc107;
 }
 
-body[data-theme="dark"] .text-secondary{
-    color:#adb5bd !important;
+.VERMELHO {
+    background: #dc3545;
 }
 
-body[data-theme="dark"] .form-control{
-    background:#2b3035;
-    color:#f8f9fa;
-    border-color:#495057;
+.PRETO {
+    background: #212529;
 }
 
-body[data-theme="dark"] .form-control:focus{
-    background:#2b3035;
-    color:#fff;
-    border-color:#6ea8fe;
-    box-shadow:none;
+.atrasado {
+    color: #fd7e14;
+    font-size: .85rem;
 }
 
-body[data-theme="dark"] .btn-outline-secondary{
-    color:#ced4da;
-    border-color:#6c757d;
+.criterio {
+    text-align: center;
+    font-weight: bold;
 }
 
-body[data-theme="dark"] .btn-outline-secondary:hover{
-    background:#495057;
-    color:#fff;
+
+/* =========================
+   Tema escuro
+   ========================= */
+
+body[data-theme="dark"] .table-hover tbody tr:hover {
+    background: #2d333b;
+}
+
+body[data-theme="dark"] .text-secondary {
+    color: #adb5bd !important;
+}
+
+body[data-theme="dark"] .form-control {
+    background: #2b3035;
+    color: #f8f9fa;
+    border-color: #495057;
+}
+
+body[data-theme="dark"] .form-control:focus {
+    background: #2b3035;
+    color: #fff;
+    border-color: #6ea8fe;
+    box-shadow: none;
+}
+
+body[data-theme="dark"] .btn-outline-secondary {
+    color: #ced4da;
+    border-color: #6c757d;
+}
+
+body[data-theme="dark"] .btn-outline-secondary:hover {
+    background: #495057;
+    color: #fff;
 }
 
 body[data-theme="dark"] .table td,
-body[data-theme="dark"] .table th{
-    background:var(--card);
-    color:var(--text);
+body[data-theme="dark"] .table th {
+    background: var(--card);
+    color: var(--text);
 }
 
-body[data-theme="dark"] .table-light th{
-    background:#2b3035 !important;
+body[data-theme="dark"] .table-light th {
+    background: #2b3035 !important;
 }
 
-body[data-theme="dark"] .card{
-    box-shadow:0 .25rem .5rem rgba(0,0,0,.35);
+body[data-theme="dark"] .card {
+    box-shadow: 0 .25rem .5rem rgba(0, 0, 0, .35);
 }
+
+
+/* =========================
+   Tabela principal
+   ========================= */
 
 .table-responsive .table {
     width: 100%;
     table-layout: fixed;
 }
 
-/* Todas as colunas centralizadas */
+.table-responsive .table th,
+.table-responsive .table td {
+    white-space: nowrap;
+}
+
 .table-responsive tbody td {
     text-align: center;
     vertical-align: middle;
 }
 
-.table-responsive .table {
-    width: 100%;
-    table-layout: fixed;
+
+/* =========================
+   Coluna Time
+   ========================= */
+
+.table-responsive .table thead th:nth-child(3) {
+    text-align: left;
 }
 
-/* Exceção: coluna Time alinhada à esquerda */
-.table-responsive tbody td:nth-child(2) {
+.table-responsive .table tbody td:nth-child(3) {
     text-align: left;
     white-space: nowrap;
 }
 
-.table-responsive thead th:nth-child(2),
-.table-responsive tbody td:nth-child(2) {
-    width: 24%;
+
+/* =========================
+   Últimos 5 jogos
+   ========================= */
+
+.ultimos-jogos {
+    text-align: center;
+    white-space: nowrap;
+}
+
+.resultado-jogo {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin: 0 3px;
 }
 
 
-/* Cabeçalho fixo criado pelo JavaScript */
+/* =========================
+   Variação de posição
+   ========================= */
+
+.variacao-posicao {
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.seta-cima {
+    color: #198754;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.seta-baixo {
+    color: #dc3545;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.posicao-igual {
+    display: inline-block;
+    width: 12px;
+    height: 6px;
+    background-color: #6c757d;
+}
+
+
+/* =========================
+   Cabeçalho original
+   ========================= */
+
+.table-responsive .table thead th {
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+
+/* =========================
+   Cabeçalho fixo
+   ========================= */
+
 .tabela-cabecalho-fixo {
     position: fixed;
     top: 0;
@@ -166,38 +252,18 @@ body[data-theme="dark"] .card{
 }
 
 .tabela-cabecalho-fixo th {
-    text-align: center;
+    box-sizing: border-box;
+    text-align: center !important;
     vertical-align: middle;
+    white-space: nowrap;
     background: var(--table) !important;
     color: var(--text);
     border-color: var(--border);
 }
 
-/* Mantém a coluna Time alinhada à esquerda */
-.tabela-cabecalho-fixo th:nth-child(2) {
-    text-align: left;
-}
 
-/* Cabeçalho fixo: mesmo alinhamento do cabeçalho original */
-.tabela-cabecalho-fixo th {
-    box-sizing: border-box;
-    text-align: center !important;
-    vertical-align: middle;
-    white-space: nowrap;
-}
+/* Coluna Time do cabeçalho fixo */
 
-/* Somente a coluna Time fica alinhada à esquerda */
-.tabela-cabecalho-fixo th:nth-child(2) {
+.tabela-cabecalho-fixo th:nth-child(3) {
     text-align: left !important;
-}
-
-/* Alinhamento do cabeçalho original */
-.table-responsive .table thead th {
-    text-align: center;
-    vertical-align: middle;
-}
-
-/* A coluna Time permanece alinhada à esquerda */
-.table-responsive .table thead th:nth-child(2) {
-    text-align: left;
 }

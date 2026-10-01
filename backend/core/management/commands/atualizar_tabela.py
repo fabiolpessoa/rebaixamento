@@ -7,6 +7,23 @@ class Command(BaseCommand):
     help = "Calcula a classificação pelos jogos finalizados"
 
     def handle(self, *args, **kwargs):
+        # Guarda a posição atual antes de recalcular a classificação
+        times_atuais = sorted(
+            Time.objects.all(),
+            key=lambda t: (
+                t.pontos,
+                t.vitorias,
+                t.saldo,
+                t.gols_pro,
+                -t.cartoes_vermelhos,
+                -t.cartoes_amarelos,
+            ),
+            reverse=True,
+        )
+
+        for posicao, time in enumerate(times_atuais, start=1):
+            time.posicao_anterior = posicao
+            time.save(update_fields=["posicao_anterior"])
 
         # Zera as estatísticas
         Time.objects.all().update(

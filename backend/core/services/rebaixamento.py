@@ -11,6 +11,8 @@ class LinhaTabela:
     time: Time
     posicao: int
 
+    variacao_posicao: int
+
     jogos_restantes: int
     jogos_atrasados: bool
 
@@ -115,6 +117,75 @@ def grupos_empate(times):
 
     return grupos
 
+def calcular_posicoes_anteriores(times):
+    jogos_finalizados = Jogo.objects.filter(
+        finalizado=True
+    ).order_by("-rodada")
+
+    if not jogos_finalizados.exists():
+        return {time.id: None for time in times}
+
+    ultima_rodada = jogos_finalizados.first().rodada
+
+    jogos_ultima_rodada = Jogo.objects.filter(
+        rodada=ultima_rodada,
+        finalizado=True
+    )
+
+    dados = {}
+
+    for time in times:
+        dados[time.id] = {
+            "pontos": time.pontos,
+            "vitorias": time.vitorias,
+            "saldo": time.saldo,
+            "gols_pro": time.gols_pro,
+            "vermelhos": time.cartoes_vermelhos,
+            "amarelos": time.cartoes_amarelos,
+        }
+
+    for jogo in jogos_ultima_rodada:
+        mandante = dados[jogo.mandante.id]
+        visitante = dados[jogo.visitante.id]
+
+        # Remove os gols do último jogo
+        mandante["gols_pro"] -= jogo.gols_mandante
+        mandante["saldo"] -= jogo.gols_mandante - jogo.gols_visitante
+
+        visitante["gols_pro"] -= jogo.gols_visitante
+        visitante["saldo"] -= jogo.gols_visitante - jogo.gols_mandante
+
+        # Remove os pontos e a vitória conquistados na rodada
+        if jogo.gols_mandante > jogo.gols_visitante:
+            mandante["pontos"] -= 3
+            mandante["vitorias"] -= 1
+
+        elif jogo.gols_visitante > jogo.gols_mandante:
+            visitante["pontos"] -= 3
+            visitante["vitorias"] -= 1
+
+        else:
+            mandante["pontos"] -= 1
+            visitante["pontos"] -= 1
+
+    ordenados = sorted(
+        times,
+        key=lambda t: (
+            dados[t.id]["pontos"],
+            dados[t.id]["vitorias"],
+            dados[t.id]["saldo"],
+            dados[t.id]["gols_pro"],
+            -dados[t.id]["vermelhos"],
+            -dados[t.id]["amarelos"],
+        ),
+        reverse=True,
+    )
+
+    return {
+        time.id: pos
+        for pos, time in enumerate(ordenados, start=1)
+    }
+
 def classificar_times(times, corte=45):
     ordenados = sorted(
         times,
@@ -130,6 +201,7 @@ def classificar_times(times, corte=45):
     )
 
     rodada_atual = max(t.jogos for t in ordenados)
+    posicoes_anteriores = calcular_posicoes_anteriores(ordenados)
     grupos = grupos_empate(ordenados)
     criterios = {}
 
@@ -163,6 +235,8 @@ def classificar_times(times, corte=45):
 
     for pos, time in enumerate(ordenados, start=1):
 
+        variacao_posicao = posicoes_anteriores[time.id] - pos
+
         camp = percentual(time.pontos, time.jogos)
 
         rec = aproveitamento_recente(time)
@@ -189,6 +263,7 @@ def classificar_times(times, corte=45):
             LinhaTabela(
                 time=time,
                 posicao=pos,
+                variacao_posicao=variacao_posicao,
                 jogos_restantes=RODADAS - time.jogos,
                 jogos_atrasados=atrasado,
                 camp_pct=camp,

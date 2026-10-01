@@ -21,6 +21,8 @@ class Time(models.Model):
     cartoes_amarelos = models.IntegerField(default=0)
     cartoes_vermelhos = models.IntegerField(default=0)
 
+    posicao_anterior = models.IntegerField(null=True, blank=True)
+
     @property
     def saldo(self):
         return self.gols_pro - self.gols_contra
