@@ -7,7 +7,11 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'core/css/dashboard.css' %}">
 </head>
-
+<script>
+function atualizarTabela() {
+    window.location.href = window.location.pathname;
+}
+</script>
 <body id="pagina" data-theme="light">
 
 <div class="container py-4">
@@ -42,7 +46,10 @@
                 {{ corte }}
             </span>
 
-            <button class="btn btn-success">
+            <button
+                type="button"
+                class="btn btn-success"
+                onclick="atualizarTabela()">
                 Atualizar
             </button>
 
@@ -111,17 +118,17 @@
                 <colgroup>
                     <col style="width: 5%;">   <!-- Posição -->
                     <col style="width: 3%;">   <!-- Variação -->
-                    <col style="width: 18%;">  <!-- Time -->
+                    <col style="width: 17%;">  <!-- Time -->
                     <col style="width: 12%;">  <!-- Últimos 5 jogos -->
                     <col style="width: 7%;">   <!-- Pontos -->
-                    <col style="width: 8%;">   <!-- Critério -->
-                    <col style="width: 7%;">   <!-- Jogos -->
-                    <col style="width: 6%;">   <!-- Restante -->
-                    <col style="width: 6%;">   <!-- Camp.% -->
-                    <col style="width: 6%;">   <!-- Rec.% -->
-                    <col style="width: 6%;">   <!-- Nec.% -->
-                    <col style="width: 6%;">   <!-- Δ% -->
-                    <col style="width: 6%;">   <!-- Faltam -->
+                    <col style="width: 4%;">   <!-- Critério -->
+                    <col style="width: 8%;">   <!-- Jogos -->
+                    <col style="width: 7%;">   <!-- Restante -->
+                    <col style="width: 7%;">   <!-- Camp.% -->
+                    <col style="width: 7%;">   <!-- Rec.% -->
+                    <col style="width: 7%;">   <!-- Nec.% -->
+                    <col style="width: 7%;">   <!-- Δ% -->
+                    <col style="width: 5%;">   <!-- Faltam -->
                     <col style="width: 4%;">   <!-- Status -->
                 </colgroup>
 
@@ -156,6 +163,10 @@
                     aria-expanded="false"
                     aria-controls="jogos-{{ linha.time.id }}"
                     class="linha-time"
+                    data-pontos="{{ linha.time.pontos }}"
+                    data-jogos="{{ linha.time.jogos }}"
+                    data-rec="{{ linha.rec_pct }}"
+                    data-restantes="{{ linha.jogos_restantes }}"
                 >
 
                     <td>{{ linha.posicao }}</td>
@@ -224,7 +235,7 @@
 
                     <td>{{ linha.rec_pct }}%</td>
 
-                    <td>
+                    <td class="celula-nec">
                         {% if linha.nec_pct is not None %}
                             {{ linha.nec_pct }}%
                         {% else %}
@@ -232,7 +243,7 @@
                         {% endif %}
                     </td>
 
-                    <td>
+                    <td class="celula-delta">
                         {% if linha.delta_pct is not None %}
                             {% if linha.delta_pct > 0 %}
                                 <span class="text-success fw-bold">
@@ -248,7 +259,7 @@
                         {% endif %}
                     </td>
 
-                    <td>
+                    <td class="celula-faltam">
                         {% if linha.pontos_faltantes is not None %}
                             {{ linha.pontos_faltantes }}
                         {% else %}
@@ -256,21 +267,17 @@
                         {% endif %}
                     </td>
 
-                    <td>
+                    <td class="celula-status">
                         <span class="status {{ linha.status }}"></span>
                     </td>
 
                 </tr>
                 <tr>
-                    <td colspan="12" class="p-0">
-                        <div
-                            id="jogos-{{ linha.time.id }}"
-                            class="collapse"
-                        >
+                    <td colspan="14" class="p-0">
+                        <div id="jogos-{{ linha.time.id }}" class="collapse">
                             <div class="p-3">
-                                <div class="row justify-content-center">
-
-                                    <div class="col-md-5">
+                                <div style="width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                                    <div class>
                                         <h6 class="fw-bold text-center">
                                             Últimos 5 jogos
                                         </h6>
@@ -329,7 +336,7 @@
                                         {% endfor %}
                                     </div>
 
-                                    <div class="col-md-5">
+                                    <div>
                                         <h6 class="fw-bold text-center">
                                             Próximos 5 jogos
                                         </h6>
@@ -503,9 +510,80 @@
     });
 
     sliderCorte.addEventListener("change", function () {
-        const url = new URL(window.location.href);
-        url.searchParams.set("corte", this.value);
-        window.location.href = url.toString();
+        const corte = Number(this.value);
+
+        document.querySelectorAll(".linha-time").forEach(function (linha) {
+
+            const pontos = Number(linha.dataset.pontos);
+            const restantes = Number(linha.dataset.restantes);
+            const rec = Number(linha.dataset.rec);
+            const celulaNec = linha.querySelector(".celula-nec");
+            const celulaDelta = linha.querySelector(".celula-delta");
+            const celulaFaltam = linha.querySelector(".celula-faltam");
+            const celulaStatus = linha.querySelector(".celula-status");
+
+            let nec = 0;
+
+            if (pontos >= corte) {
+                nec = null;
+            } else if (restantes === 0) {
+                nec = 100;
+            } else {
+                const pontosFaltantes = corte - pontos;
+                nec = (pontosFaltantes / (restantes * 3)) * 100;
+                nec = Math.round(nec * 10) / 10;
+            }
+
+            if (nec === null) {
+                celulaNec.textContent = "—";
+            } else {
+                celulaNec.textContent = nec.toFixed(1).replace(".", ",") + "%";
+            }
+
+            if (nec === null) {
+                celulaDelta.textContent = "—";
+            } else {
+                const delta = Math.round((rec - nec) * 10) / 10;
+
+                if (delta > 0) {
+                    celulaDelta.innerHTML =
+                        '<span class="text-success fw-bold">+' +
+                        delta.toFixed(1).replace(".", ",") +
+                        '%</span>';
+                } else {
+                    celulaDelta.innerHTML =
+                        '<span class="text-danger fw-bold">' +
+                        delta.toFixed(1).replace(".", ",") +
+                        '%</span>';
+                }
+            }
+
+            if (pontos >= corte) {
+                celulaFaltam.textContent = "0";
+            } else {
+                celulaFaltam.textContent = corte - pontos;
+            }
+
+            let status;
+
+            if (pontos >= corte) {
+                status = "AZUL";
+            } else if (pontos + (restantes * 3) < corte) {
+                status = "PRETO";
+            } else {
+                const delta = rec - nec;
+
+                if (delta >= 15) {
+                    status = "VERDE";
+                } else if (delta >= 5) {
+                    status = "AMARELO";
+                } else {
+                    status = "VERMELHO";
+                }
+            }
+
+            celulaStatus.innerHTML = '<span class="status ' + status + '"></span>';
+        });
     });
 </script>
 
