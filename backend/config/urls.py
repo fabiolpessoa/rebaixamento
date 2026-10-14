@@ -16,9 +16,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from core.views import dashboard
+from core.views import dashboard, atualizar_dados
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("", dashboard, name="dashboard"),
+    path("atualizar/", atualizar_dados, name="atualizar_dados"),
 ]

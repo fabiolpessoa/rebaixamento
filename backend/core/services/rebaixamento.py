@@ -118,20 +118,25 @@ def grupos_empate(times):
     return grupos
 
 def calcular_posicoes_anteriores(times):
-    jogos_finalizados = Jogo.objects.filter(
-        finalizado=True
-    ).order_by("-rodada")
-
-    if not jogos_finalizados.exists():
-        return {time.id: None for time in times}
-
-    ultima_rodada = jogos_finalizados.first().rodada
-
-    jogos_ultima_rodada = Jogo.objects.filter(
-        rodada=ultima_rodada,
-        finalizado=True
+    todos_jogos = list(
+        Jogo.objects
+        .select_related("mandante", "visitante")
+        .order_by("rodada")
     )
 
+    jogos_finalizados = [
+        jogo for jogo in todos_jogos if jogo.finalizado
+    ]
+
+    if not jogos_finalizados:
+        return {time.id: None for time in times}
+
+    ultima_rodada = jogos_finalizados[0].rodada
+
+    jogos_ultima_rodada = [
+        jogo for jogo in jogos_finalizados
+        if jogo.rodada == ultima_rodada
+    ]
     dados = {}
 
     for time in times:
@@ -231,6 +236,15 @@ def classificar_times(times, corte=45):
             atual = grupo_ordenado[i]
             criterios[atual.id] = criterio_desempate(atual, anterior)
 
+    todos_jogos = list(
+        Jogo.objects
+        .select_related("mandante", "visitante")
+        .order_by("rodada")
+    )
+
+    jogos_finalizados = [
+        jogo for jogo in todos_jogos if jogo.finalizado
+    ]
     tabela = []
 
     for pos, time in enumerate(ordenados, start=1):
@@ -239,7 +253,7 @@ def classificar_times(times, corte=45):
 
         camp = percentual(time.pontos, time.jogos)
 
-        rec = aproveitamento_recente(time)
+        rec = aproveitamento_recente(time, jogos_finalizados)
 
         if time.pontos >= corte:
             nec = None
@@ -258,7 +272,7 @@ def classificar_times(times, corte=45):
         atrasado = time.jogos < rodada_atual
 
         status = definir_status(time, rec, nec, corte)
-
+        jogos_time = jogos_do_time(time, todos_jogos)
         tabela.append(
             LinhaTabela(
                 time=time,
@@ -273,26 +287,25 @@ def classificar_times(times, corte=45):
                 pontos_faltantes=pontos_faltantes,
                 criterio=criterio,
                 status=status,
-                jogos_anteriores=jogos_do_time(time)["anteriores"],
-                jogos_proximos=jogos_do_time(time)["proximos"],
+                jogos_anteriores=jogos_time["anteriores"],
+                jogos_proximos=jogos_time["proximos"],
             )
         )
 
     return tabela
 
 
-def aproveitamento_recente(time):
+def aproveitamento_recente(time, jogos_finalizados):
     restantes = 38 - time.jogos
 
     if restantes == 0:
         return 0.0
 
-    jogos = (
-        Jogo.objects
-        .filter(finalizado=True)
-        .filter(Q(mandante=time) | Q(visitante=time))
-        .order_by("-rodada")[:restantes]
-    )
+    jogos = [
+        jogo
+        for jogo in jogos_finalizados
+        if jogo.mandante_id == time.id or jogo.visitante_id == time.id
+    ][:restantes]
 
     if not jogos:
         return 0.0
@@ -300,12 +313,15 @@ def aproveitamento_recente(time):
     pontos = 0
 
     for jogo in jogos:
-        if jogo.mandante == time:
+        if jogo.mandante_id == time.id:
             pro = jogo.gols_mandante
             contra = jogo.gols_visitante
         else:
             pro = jogo.gols_visitante
             contra = jogo.gols_mandante
+
+        if pro is None or contra is None:
+            continue
 
         if pro > contra:
             pontos += 3
@@ -314,21 +330,29 @@ def aproveitamento_recente(time):
 
     return round((pontos / (len(jogos) * 3)) * 100, 1)
 
-def jogos_do_time(time):
-    jogos = (
-        Jogo.objects
-        .filter(Q(mandante=time) | Q(visitante=time))
-        .order_by("rodada")
-    )
 
-    jogos_anteriores = []
-    jogos_proximos = []
 
-    for jogo in jogos:
-        if jogo.finalizado:
-            jogos_anteriores.append(jogo)
-        else:
-            jogos_proximos.append(jogo)
+def jogos_do_time(time, todos_jogos=None):
+    if todos_jogos is None:
+        todos_jogos = (
+            Jogo.objects
+            .filter(Q(mandante=time) | Q(visitante=time))
+            .select_related("mandante", "visitante")
+            .order_by("rodada")
+        )
+
+    jogos_do_time = [
+        jogo for jogo in todos_jogos
+        if jogo.mandante_id == time.id or jogo.visitante_id == time.id
+    ]
+
+    jogos_anteriores = [
+        jogo for jogo in jogos_do_time if jogo.finalizado
+    ]
+
+    jogos_proximos = [
+        jogo for jogo in jogos_do_time if not jogo.finalizado
+    ]
 
     return {
         "anteriores": jogos_anteriores[-5:],

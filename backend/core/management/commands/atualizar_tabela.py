@@ -1,4 +1,6 @@
+
 from django.core.management.base import BaseCommand
+from django.db import transaction
 
 from core.models import Time, Jogo
 
@@ -6,6 +8,7 @@ from core.models import Time, Jogo
 class Command(BaseCommand):
     help = "Calcula a classificação pelos jogos finalizados"
 
+    @transaction.atomic
     def handle(self, *args, **kwargs):
         # Guarda a posição atual antes de recalcular a classificação
         times_atuais = sorted(
@@ -23,9 +26,13 @@ class Command(BaseCommand):
 
         for posicao, time in enumerate(times_atuais, start=1):
             time.posicao_anterior = posicao
-            time.save(update_fields=["posicao_anterior"])
 
-        # Zera as estatísticas
+        Time.objects.bulk_update(
+            times_atuais,
+            ["posicao_anterior"],
+        )
+
+        # Zera as estatísticas em uma única operação
         Time.objects.all().update(
             pontos=0,
             jogos=0,
@@ -36,12 +43,21 @@ class Command(BaseCommand):
             gols_contra=0,
         )
 
-        jogos = Jogo.objects.filter(finalizado=True)
+        # Carrega os times em memória para evitar consultas repetidas
+        times = {
+            time.id: time
+            for time in Time.objects.all()
+        }
+
+        jogos = (
+            Jogo.objects
+            .filter(finalizado=True)
+            .select_related("mandante", "visitante")
+        )
 
         for jogo in jogos:
-
-            mandante = jogo.mandante
-            visitante = jogo.visitante
+            mandante = times[jogo.mandante_id]
+            visitante = times[jogo.visitante_id]
 
             gm = jogo.gols_mandante
             gv = jogo.gols_visitante
@@ -71,8 +87,19 @@ class Command(BaseCommand):
                 mandante.pontos += 1
                 visitante.pontos += 1
 
-            mandante.save()
-            visitante.save()
+        # Grava as estatísticas de todos os times em lote
+        Time.objects.bulk_update(
+            times.values(),
+            [
+                "pontos",
+                "jogos",
+                "vitorias",
+                "empates",
+                "derrotas",
+                "gols_pro",
+                "gols_contra",
+            ],
+        )
 
         self.stdout.write(
             self.style.SUCCESS("Classificação atualizada!")
