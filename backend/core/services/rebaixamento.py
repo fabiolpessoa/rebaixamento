@@ -305,7 +305,10 @@ def aproveitamento_recente(time, jogos_finalizados):
         jogo
         for jogo in jogos_finalizados
         if jogo.mandante_id == time.id or jogo.visitante_id == time.id
-    ][:restantes]
+    ]
+
+    jogos.sort(key=lambda jogo: jogo.rodada, reverse=True)
+    jogos = jogos[:restantes]
 
     if not jogos:
         return 0.0
